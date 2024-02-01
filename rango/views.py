@@ -19,4 +19,13 @@ def about(request):
 
 def my_view(request):
     context = {'message': 'This is a message passed from the view.'}
-    return render(request, 'rango/mytemplate.html', context)
+    return render(request, 'rango/template.html', context)
+
+
+def greeting_view(request):
+    context = {'greeting_message': 'Have a great day!'}
+    return render(request, 'rango/greeting.html', context)
+
+
+def about(request):
+    return render(request, 'rango/about.html')
