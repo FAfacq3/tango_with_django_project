@@ -1,5 +1,9 @@
+{% load static %}
 <html>
-<head><title>Rango</title></head>
+<head>
+    <title>Rango</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'rango/css/styles.css' %}">
+</head>
 <body>
     <h1>Welcome to Rango</h1>
 
@@ -9,7 +13,8 @@
             <li>{{ category.name }}</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'add_page' %}">Add a Page</a><br>
+
+    <a href="{% url 'add_page' %}">Add a Page</a>
     <a href="{% url 'add_category' %}">Add a Category</a>
 </body>
 </html>
