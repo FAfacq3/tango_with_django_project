@@ -9,13 +9,17 @@
     {% else %}
         <p>You are not logged in.</p>
     {% endif %}
-    <p>You have visited this site {{ visits }} times.</p>
 
+    <p>You have visited this site {{ visits }} times.</p>
 
     <h2>Categories:</h2>
     <ul>
         {% for category in categories %}
-            <li>{{ category.name }}</li>
+            <li>
+                {{ category.name }}
+                <button class="like-button" data-category-id="{{ category.id }}">👍 Like</button>
+                <span id="likes-count-{{ category.id }}">{{ category.likes }}</span> Likes
+            </li>
         {% empty %}
             <li>No categories yet.</li>
         {% endfor %}
@@ -23,4 +27,30 @@
 
     <br>
     <a href="{% url 'add_category' %}" class="btn">Add a Category</a>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $(".like-button").click(function() {
+            var categoryId = $(this).attr("data-category-id");
+            var likesCountSpan = $("#likes-count-" + categoryId);
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'like_category' %}",
+                data: {
+                    'category_id': categoryId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.status === 'ok') {
+                        likesCountSpan.text(response.likes);
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                }
+            });
+        });
+    });
+    </script>
 {% endblock %}

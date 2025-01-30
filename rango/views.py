@@ -4,13 +4,15 @@ from rango.forms import CategoryForm, PageForm, UserForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
-    response = render(request, 'rango/index.html')
-
+    categories = Category.objects.all()
     visits = request.session.get('visits', 0) + 1
     request.session['visits'] = visits
+
+    response = render(request, 'rango/index.html', {'categories': categories, 'visits': visits})
 
     last_visit_cookie = request.COOKIES.get('last_visit', str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
@@ -20,8 +22,7 @@ def index(request):
         response.set_cookie('visits', visits)
         response.set_cookie('last_visit', str(datetime.now()))
 
-    response.context_data = {'visits': visits}  
-    return render(request, 'rango/index.html', {'visits': visits})
+    return response
 
 @login_required
 def add_category(request):
@@ -29,7 +30,8 @@ def add_category(request):
         form = CategoryForm(request.POST)
         if form.is_valid():
             form.save(commit=True)
-            return redirect('/rango/')
+            return redirect('index')
+
     else:
         form = CategoryForm()
 
@@ -79,3 +81,18 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('index')
+
+@csrf_exempt
+def like_category(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+
+        try:
+            category = Category.objects.get(id=category_id)
+            category.likes += 1
+            category.save()
+            return JsonResponse({'status': 'ok', 'likes': category.likes})
+        except Category.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Category not found'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
