@@ -3,12 +3,25 @@ from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm, UserForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 
 def index(request):
-    categories = Category.objects.all()
-    context_dict = {'categories': categories}
-    return render(request, 'rango/index.html', context_dict)
+    response = render(request, 'rango/index.html')
+
+    visits = request.session.get('visits', 0) + 1
+    request.session['visits'] = visits
+
+    last_visit_cookie = request.COOKIES.get('last_visit', str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
+
+    if (datetime.now() - last_visit_time).days > 0:
+        visits += 1
+        response.set_cookie('visits', visits)
+        response.set_cookie('last_visit', str(datetime.now()))
+
+    response.context_data = {'visits': visits}  
+    return render(request, 'rango/index.html', {'visits': visits})
 
 @login_required
 def add_category(request):
