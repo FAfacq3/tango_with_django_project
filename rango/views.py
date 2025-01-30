@@ -31,10 +31,8 @@ def add_category(request):
         if form.is_valid():
             form.save(commit=True)
             return redirect('index')
-
     else:
         form = CategoryForm()
-
     return render(request, 'rango/add_category.html', {'form': form})
 
 @login_required
