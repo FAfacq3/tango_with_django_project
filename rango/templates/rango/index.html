@@ -1,20 +1,24 @@
+{% extends "rango/base.html" %}
 {% load static %}
-<html>
-<head>
-    <title>Rango</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'rango/css/styles.css' %}">
-</head>
-<body>
+
+{% block content %}
     <h1>Welcome to Rango</h1>
+
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }}</p>
+    {% else %}
+        <p>You are not logged in.</p>
+    {% endif %}
 
     <h2>Categories:</h2>
     <ul>
         {% for category in categories %}
             <li>{{ category.name }}</li>
+        {% empty %}
+            <li>No categories yet.</li>
         {% endfor %}
     </ul>
 
-    <a href="{% url 'add_page' %}">Add a Page</a>
-    <a href="{% url 'add_category' %}">Add a Category</a>
-</body>
-</html>
+    <br>
+    <a href="{% url 'add_category' %}" class="btn">Add a Category</a>
+{% endblock %}
