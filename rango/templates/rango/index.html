@@ -2,65 +2,67 @@
 {% load static %}
 
 {% block content %}
-    <h1>Welcome to Rango</h1>
+    <h1>Rango says...</h1>
+    <p>Hey there partner! Crunchy, creamy, cookie, candy, cupcake!</p>
 
-    {% if user.is_authenticated %}
-        <p>Logged in as: {{ user.username }}</p>
-    {% else %}
-        <p>You are not logged in.</p>
-    {% endif %}
-
-    <p>You have visited this site {{ visits }} times.</p>
-
-    <h2>Categories:</h2>
+    <h2>Most Liked Categories</h2>
     <ul>
         {% for category in categories %}
             <li>
-                {{ category.name }}
-                <button class="like-button" data-category-id="{{ category.id }}">👍 Like</button>
-                <span id="likes-count-{{ category.id }}">{{ category.likes }}</span> Likes
+                <a href="{% url 'rango:show_category' category.name %}" class="text-decoration-none text-dark fw-bold">
+                    {{ category.name }}
+                </a>
+                <button class="btn btn-outline-primary btn-sm like-button" data-category-id="{{ category.id }}">
+                    👍 Like
+                </button>
+                <span id="likes-count-{{ category.id }}" class="badge bg-primary">{{ category.likes }}</span> Likes
             </li>
         {% empty %}
             <li>No categories yet.</li>
         {% endfor %}
     </ul>
 
-    <br>
-    {% if user.is_authenticated %}
-        <a href="{% url 'rango:add_category' %}">Add Category</a>
-    {% endif %}
+    <h2>Most Viewed Pages</h2>
+    <ul>
+        {% for page in most_viewed_pages %}
+            <li>
+                <a href="{% url 'rango:show_page' page.id %}" class="text-decoration-none text-dark fw-bold">
+                    {{ page.title }}
+                </a> ({{ page.views }} views)
+            </li>
+        {% empty %}
+            <li>No popular pages yet.</li>
+        {% endfor %}
+    </ul>
 
+    <p>
+        <a href="{% url 'rango:add_category' %}" class="btn btn-primary">Add New Category</a>
+    </p>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
-    $(document).ready(function() {
-        $(".like-button").click(function() {
-            var categoryId = $(this).attr("data-category-id");
-            var likesCountSpan = $("#likes-count-" + categoryId);
+        $(document).ready(function() {
+            $(".like-button").click(function() {
+                var categoryId = $(this).attr("data-category-id");
+                var likesCountSpan = $("#likes-count-" + categoryId);
 
-            $.ajax({
-                type: "POST",
-                url: "{% url 'rango:like_category' %}",
-                data: {
-                    'category_id': categoryId,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                dataType: "json",
-                success: function(response) {
-                    if (response.status === 'ok') {
-                        likesCountSpan.text(response.likes);
-                    } else {
-                        alert("Error: " + response.message);
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'rango:like_category' %}",
+                    data: {
+                        'category_id': categoryId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'ok') {
+                            likesCountSpan.text(response.likes);
+                        } else {
+                            alert("Error: " + response.message);
+                        }
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.log("AJAX Error: ", status, error);
-                    alert("Something went wrong. Please try again later.");
-                }
+                });
             });
         });
-    });
     </script>
 
 {% endblock %}

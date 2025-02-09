@@ -1,0 +1,12 @@
+{% extends "rango/base.html" %}
+
+{% block content %}
+    <h1>{{ page.title }}</h1>
+    <p>URL: <a href="{{ page.url }}" target="_blank" class="text-decoration-none text-dark fw-bold">
+        {{ page.url }}
+    </a></p>
+    <p>Views: {{ page.views }}</p>
+
+
+<p class="mt-3"><a href="{% url 'rango:index' %}" class="btn btn-secondary">Back to Home</a></p>
+{% endblock %}
