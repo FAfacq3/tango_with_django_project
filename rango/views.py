@@ -57,19 +57,17 @@ def add_category(request):
         form = CategoryForm()
     return render(request, 'rango/add_category.html', {'form': form})
 
-from django.shortcuts import get_object_or_404
-from rango.forms import PageForm
-
 def add_page(request, category_name):
     category = get_object_or_404(Category, name=category_name)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PageForm(request.POST)
         if form.is_valid():
             page = form.save(commit=False)
             page.category = category
+            page.views = 0
             page.save()
-            return redirect('rango:show_category', category_name=category_name)
+            return redirect('rango:show_category', category_name=category.name)
     else:
         form = PageForm()
 

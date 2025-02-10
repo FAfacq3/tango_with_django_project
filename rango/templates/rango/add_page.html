@@ -1,16 +1,12 @@
 {% extends "rango/base.html" %}
-
-{% block title %}Add Page{% endblock %}
-
 {% block content %}
-<h2>Add a New Page to "{{ category.name }}"</h2>
+    <h1>Add a New Page to {{ category.name }}</h1>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <p><strong>Note:</strong> Make sure the URL starts with "http://" or "https://". If not, it will be added automatically.</p>
-    <button type="submit">Add Page</button>
-</form>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Page</button>
+    </form>
 
-<p><a href="{% url 'rango:show_category' category.name %}">Back to {{ category.name }}</a></p>
+    <a href="{% url 'rango:show_category' category.name %}" class="btn btn-secondary mt-3">Back to {{ category.name }}</a>
 {% endblock %}

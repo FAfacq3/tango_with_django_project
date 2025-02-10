@@ -11,13 +11,8 @@ class CategoryForm(forms.ModelForm):
 
 class PageForm(forms.ModelForm):
     title = forms.CharField(max_length=128, help_text="Enter the page title.")
-    url = forms.URLField(max_length=200, help_text="Enter the URL of the page.")
-
-    def clean_url(self):
-        url = self.cleaned_data.get('url')
-        if url and not url.startswith(('http://', 'https://')):
-            url = 'http://' + url
-        return url
+    url = forms.URLField(max_length=200, help_text="Enter the URL.")
+    views = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
     class Meta:
         model = Page

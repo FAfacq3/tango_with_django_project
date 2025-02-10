@@ -1,30 +1,25 @@
-a {
-    color: #007bff;
-    text-decoration: none;
-    background-color: transparent;
-    padding: 0;
-    display: inline;
-    border-radius: 0;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007bff;
+.page-link-btn {
+    background-color: #007bff !important;
     color: white !important;
-    text-decoration: none;
+    padding: 10px 15px;
     border-radius: 5px;
-    margin: 5px 0;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
 }
 
-.btn:hover {
-    background-color: #0056b3;
+a.page-link-btn {
+    color: white !important;
+    text-decoration: none !important;
 }
 
-.text-dark {
-    color: #212529 !important;
+.page-link-btn:hover {
+    background-color: #0056b3 !important;
+    color: white !important;
+}
+
+.list-group-item a.page-link-btn {
+    color: white !important;
 }
