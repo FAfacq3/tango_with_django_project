@@ -22,24 +22,10 @@ def index(request):
 
     visits = request.session.get('visits', 0) + 1
     request.session['visits'] = visits
+    request.session['last_visit'] = str(datetime.now())
 
-    response = render(request, 'rango/index.html', {
-        'categories': categories,
-        'pages': pages,
-        'visits': visits
-    })
+    return render(request, 'rango/index.html', {'categories': categories, 'pages': pages})
 
-    last_visit_cookie = request.COOKIES.get('last_visit', str(datetime.now()))
-    try:
-        last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        last_visit_time = datetime.now()
-
-    if (datetime.now() - last_visit_time).days > 0:
-        request.session['visits'] = visits + 1
-        response.set_cookie('last_visit', str(datetime.now()))
-
-    return response
 
 def show_category(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
@@ -58,8 +44,8 @@ def add_category(request):
         form = CategoryForm()
     return render(request, 'rango/add_category.html', {'form': form})
 
-def add_page(request, category_name):
-    category = get_object_or_404(Category, name=category_name)
+def add_page(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
 
     if request.method == "POST":
         form = PageForm(request.POST)
@@ -68,7 +54,7 @@ def add_page(request, category_name):
             page.category = category
             page.views = 0
             page.save()
-            return redirect('rango:show_category', category_name=category.name)
+            return redirect('rango:show_category', category_slug=category.slug)
     else:
         form = PageForm()
 
@@ -145,3 +131,7 @@ def search(request):
         return JsonResponse({"pages": results})
 
     return JsonResponse({"pages": []})
+
+def about(request):
+    visits = request.session.get('visits', 0)
+    return render(request, 'rango/about.html', {'visits': visits})
