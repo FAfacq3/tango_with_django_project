@@ -5,6 +5,18 @@
     <form method="post">
         {% csrf_token %}
         {{ user_form.as_p }}
+        {% if user_form.errors %}
+            <div class="alert alert-danger">
+                <strong>Errors:</strong>
+                <ul>
+                    {% for field, errors in user_form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <input type="submit" value="Register">
     </form>
 {% endblock %}
