@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-    <h1 class="fw-bold">Rango says...</h1>
-    <p class="text-muted">Hey there partner! Crunchy, creamy, cookie, candy, cupcake!</p>
+    <p>Rango says hey there partner!</p>
+    <p class="text-muted">Crunchy, creamy, cookie, candy, cupcake!</p>
 
     <h2 class="fw-bold">Most Liked Categories</h2>
     <ul class="list-group">
@@ -39,11 +39,6 @@
             <li class="list-group-item">No pages yet.</li>
         {% endfor %}
     </ul>
-
-    <div class="mt-4 text-center">
-        <a href="{% url 'rango:about' %}" class="btn btn-secondary">About</a>
-        <a href="{% url 'rango:add_category' %}" class="btn btn-primary">Add New Category</a>
-    </div>
 
 {% endblock %}
 

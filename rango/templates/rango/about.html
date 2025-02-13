@@ -1,5 +1,10 @@
 {% extends "rango/base.html" %}
+{% load static %}
+
 {% block content %}
     <h1>About Rango</h1>
     <p>Visits: {{ visits }}</p>
+
+    <img src="{% static 'rango/images/rango.jpg' %}" alt="Rango Image" style="width: 300px; height: auto;">
+
 {% endblock %}

@@ -1,17 +1,10 @@
-from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
-
-from rango.models import Category, Page
-from rango.forms import CategoryForm, PageForm, UserForm
+from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from datetime import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404
-from rango.models import Category, Page
-
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from rango.models import Category, Page
 from datetime import datetime
 import logging
@@ -38,14 +31,17 @@ def add_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
         if form.is_valid():
-            form.save(commit=True)
-            return redirect('index')
+            category = form.save(commit=False)
+            category.views = 0
+            category.save()
+            return redirect('rango:index')
     else:
         form = CategoryForm()
     return render(request, 'rango/add_category.html', {'form': form})
 
-def add_page(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
+
+def add_page(request, category_name_slug):
+    category = get_object_or_404(Category, slug=category_name_slug)
 
     if request.method == "POST":
         form = PageForm(request.POST)
@@ -56,7 +52,7 @@ def add_page(request, category_slug):
             page.save()
             return redirect('rango:show_category', category_slug=category.slug)
     else:
-        form = PageForm()
+        form = PageForm(initial={'views': 0})
 
     return render(request, 'rango/add_page.html', {'form': form, 'category': category})
 
@@ -77,15 +73,25 @@ def show_page(request, page_id):
 def register(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
 
-        if user_form.is_valid():
+        if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user.password)
             user.save()
-            return redirect('login')
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            login(request, user)
+
+            return redirect('rango:index')
     else:
         user_form = UserForm()
-    return render(request, 'rango/register.html', {'user_form': user_form})
+        profile_form = UserProfileForm()
+
+    return render(request, 'rango/register.html', {'user_form': user_form, 'profile_form': profile_form})
 
 def user_login(request):
     if request.method == 'POST':
@@ -135,3 +141,7 @@ def search(request):
 def about(request):
     visits = request.session.get('visits', 0)
     return render(request, 'rango/about.html', {'visits': visits})
+
+@login_required
+def restricted(request):
+    return render(request, 'rango/restricted.html')

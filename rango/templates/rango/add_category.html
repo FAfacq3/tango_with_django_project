@@ -9,6 +9,18 @@
     {% csrf_token %}
     <div class="mb-3">
         {{ form.as_p }}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Errors:</strong>
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|capfirst }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
     <button type="submit" class="btn btn-success">Submit</button>
 </form>
