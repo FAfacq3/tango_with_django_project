@@ -40,8 +40,8 @@ def add_category(request):
     return render(request, 'rango/add_category.html', {'form': form})
 
 
-def add_page(request, category_name_slug):
-    category = get_object_or_404(Category, slug=category_name_slug)
+def add_page(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
 
     if request.method == "POST":
         form = PageForm(request.POST)
@@ -82,11 +82,12 @@ def register(request):
 
             profile = profile_form.save(commit=False)
             profile.user = user
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
             profile.save()
 
-            login(request, user)
+            return redirect('rango:login')
 
-            return redirect('rango:index')
     else:
         user_form = UserForm()
         profile_form = UserProfileForm()
@@ -139,9 +140,20 @@ def search(request):
     return JsonResponse({"pages": []})
 
 def about(request):
-    visits = request.session.get('visits', 0)
+    visits = request.session.get('visits', 0) + 1
+    request.session['visits'] = visits
+    request.session['last_visit'] = str(datetime.now())
+
     return render(request, 'rango/about.html', {'visits': visits})
 
 @login_required
 def restricted(request):
     return render(request, 'rango/restricted.html')
+
+def update_category_views(request, category_slug):
+    if request.method == "POST":
+        category = get_object_or_404(Category, slug=category_slug)
+        category.views += 1
+        category.save()
+        return JsonResponse({'views': category.views})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
